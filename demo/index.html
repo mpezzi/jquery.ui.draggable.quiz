@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+  <title>jQuery UI Draggable Quiz Plugin</title>
+  
+  <style type="text/css">
+    
+    .questions {
+      height: 100px;
+    }
+    
+    .question {
+      display: block;
+      float: left;
+    }
+    
+    .choice {
+      height: 100px;
+      margin-bottom: 10px;
+      border: 1px solid #808080;
+    }
+    
+    .ui-state-hover {
+      border-color: #000;
+    }
+    
+  </style>
+  
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="../jquery.ui.draggable.quiz.js"></script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('#quiz').draggableQuiz({
+        answers: {
+          '#choice-1' : [ '.question-1', '.question-5' ], 
+          '#choice-2' : [ '.question-2' ], 
+          '#choice-3' : [ '.question-3' ], 
+          '#choice-4' : [ '.question-4' ]
+        }
+      });
+    });
+  </script>
+  
+</head>
+
+<body>
+
+<div id="quiz">
+  
+  <div class="questions">
+    
+    <img src="question.png" data="question-1" class="question question-1" alt="Question" />
+    <img src="question.png" data="question-2" class="question question-2" alt="Question" />
+    <img src="question.png" data="question-3" class="question question-3" alt="Question" />
+    <img src="question.png" data="question-4" class="question question-4" alt="Question" />
+    <img src="question.png" data="question-5" class="question question-5" alt="Question" />
+    
+  </div> <!-- / .questions -->
+  
+  <div class="choices">
+    
+    <div id="choice-1" class="choice">
+      
+    </div> <!-- / .choice -->
+    
+    <div id="choice-2" class="choice">
+      
+    </div> <!-- / .choice -->
+    
+    <div id="choice-3" class="choice">
+      
+    </div> <!-- / .choice -->
+    
+    <div id="choice-4" class="choice">
+      
+    </div> <!-- / .choice -->
+    
+  </div> <!-- / .choices -->
+  
+</div> <!-- / #quiz -->
+
+</body>
+</html>
