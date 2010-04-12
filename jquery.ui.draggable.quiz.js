@@ -1,7 +1,19 @@
-/**
- * jQuery UI Draggable Quiz Plugin.
+/*
+ * jQuery UI Draggable Quiz Plugin by M. Pezzi
+ * http://thespiral.ca/jquery/draggableQuiz/demo/
+ * Version: 1.0 (03/07/10)
+ * Dual licensed under the MIT and GPL licences:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ * Requires: jQuery v1.4.2 or later
  */
+
 ;(function($){
+  
+  // Ensure the required jQuery UI Plugins are available.
+  if ( $.fn.draggable == undefined || $.fn.droppable == undefined )
+    alert('Plugin required UI.Draggable and UI.Droppable');
+  
   $.fn.draggableQuiz = function(options) {
     return this.each(function(){
       var self = $(this), o = $.extend({ self: self }, $.fn.draggableQuiz.defaults, options || {}),
@@ -42,10 +54,8 @@
     choice: '.choice',
     choices: '.choices',
     choicesHoverClass: 'ui-state-hover',
-    after: function() {},
-    passed: function() {
-      alert('passed');
-    },
+    after: null,
+    passed: null,
     questionIn: function(speed, callback) {
       $(this).animate({ opacity: 1 }, speed, callback);
     },
@@ -93,6 +103,7 @@
     o.choiceOut.call(question, o.speedOut, function(){
       o.questionIn.call($(o.question +"[data='"+ question.attr('data') + "']", o.questions).draggable('enable'), o.speedIn, function(){
         question.remove();
+        
         checkChoices(o);
       });
     });
@@ -107,9 +118,14 @@
     o.passed.call(this);
   }
   
-  function log(message) {
+  function log(s) {
     if ( window.console && window.console.log )
-      window.console.log(message);
+      window.console.log(s);
+  }
+  
+  function debug(s) {
+    if ( $.fn.draggableQuiz.debug )
+      log(s);
   }
   
 })(jQuery);
