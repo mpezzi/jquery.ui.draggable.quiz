@@ -17,10 +17,30 @@
   $.fn.draggableQuiz = function(options) {
     return this.each(function(){
       var self = $(this), o = $.extend({ self: self }, $.fn.draggableQuiz.defaults, options || {}),
-          questions = $(o.questions, self),
+          question_container = $(o.questions, self),
           choices = $(o.choice, self);
       
-      // Make questions droppable.
+      o.after = o.after || null;
+      o.passed = o.passed || null;
+      o.draggable = {
+        cursor: 'move',
+        helper: 'clone',
+        revert: 'invalid',
+        zIndex: 10000,
+        start: function(e, ui) {
+          choice = $(e.target).parents(o.choice);
+          
+          $(o.choiceInner, choices).css('z-index', 10);
+          $(o.choiceInner, choice).css('z-index', 11);
+          
+          ui.helper.animate({ opacity: 0.5 }, 1000);
+        }
+      };
+      
+      // Make the questions draggable.
+      $(o.question, o.questions).draggable(o.draggable);
+      
+      // Make the choices droppable.
       $(choices).droppable({
         accept: o.questions +' '+ o.question +', '+ o.choice +' '+ o.question,
         hoverClass: o.questionsHoverClass,
@@ -29,8 +49,8 @@
         }
       });
       
-      // Make choices droppable.
-      $(questions).droppable({
+      // Make the questions container droppable.
+      $(question_container).droppable({
         accept: o.choice +' '+ o.question,
         hoverClass: o.choicesHoverClass,
         drop: function(e, ui) {
@@ -38,10 +58,7 @@
         }
       });
       
-      // Make questions draggable.
-      $(o.question, o.questions).draggable(o.draggable);
-      
-      o.after.call(this);
+      o.after;
     });
   };
   
@@ -52,8 +69,10 @@
     questions: '.questions',
     questionsHoverClass: 'ui-state-hover',
     choice: '.choice',
+    choiceInner: '.choice-inner',
     choices: '.choices',
     choicesHoverClass: 'ui-state-hover',
+    choiceAppendTo: null,
     after: null,
     passed: null,
     questionIn: function(speed, callback) {
@@ -70,33 +89,29 @@
     }
   };
   
-  $.fn.draggableQuiz.defaults.draggable = {
-    cursor: 'move',
-    helper: 'clone',
-    revert: 'invalid',
-    zIndex: 10000,
-    start: function(e, ui) {
-      room = $(e.target).parents($.fn.draggableQuiz.defaults.choice);
-      ui.helper.animate({ opacity: 0.5 }, 1000);
-    }
-  };
-  
-  function makeChoice(question, toChoice, fromChoice, e, o) {
+  function makeChoice($question, $toChoice, $fromChoice, e, o) {
     // Check if user moved to same choice.
-    if ( toChoice.attr('id') == fromChoice.attr('id') )
+    if ( $toChoice.attr('id') == $fromChoice.attr('id') )
       return false;
     
     // Add question to choice.
-    o.choiceIn.call(question.clone().draggable(o.draggable).appendTo(toChoice), o.speedIn, function(){
+    $question.clone().draggable(o.draggable).appendTo(o.choiceAppendTo ? $toChoice.find(o.choiceAppendTo) : $toChoice);
+    $(o.question +"[data='"+ $question.attr('data') +"']", $fromChoice).remove();
+    checkChoices(o);
+    
+    /*
+    // Add question to choice.
+    o.choiceIn.call(question.clone().draggable(o.draggable).appendTo(o.choiceAppendTo ? $(o.choiceAppendTo, toChoice) : toChoice), o.speedIn, function(){
       o.choiceOut.call($(o.question +"[data='"+ question.attr('data') +"']", fromChoice), o.speedOut, function(){
         $(this).remove();
       });
       
-      // Disable question.
-      o.questionOut.call($(o.questions +' '+ o.question +"[data='"+ question.attr('data') +"']", o.self).draggable('disable'), o.speedOut);
-      
       checkChoices(o);
     });
+    
+    // Disable question.
+    $(o.questions +' '+ o.question +"[data='"+ question.attr('data') +"']", o.self).draggable('disable').animate({ opacity: 0.5 }, o.speedOut);
+    */
   }
   
   function unmakeChoice(question, o) {
@@ -115,9 +130,12 @@
         if ( $(o.answers[a][i], a).length == 0 )
           return false;
     
-    o.passed.call(this);
+    alert('passed');
+    o.passed;
   }
   
+  
+  // Debug functions.
   function log(s) {
     if ( window.console && window.console.log )
       window.console.log(s);
