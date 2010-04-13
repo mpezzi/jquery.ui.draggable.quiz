@@ -20,23 +20,6 @@
           question_container = $(o.questions, self),
           choices = $(o.choice, self);
       
-      o.after = o.after || null;
-      o.passed = o.passed || null;
-      o.draggable = {
-        cursor: 'move',
-        helper: 'clone',
-        revert: 'invalid',
-        zIndex: 10000,
-        start: function(e, ui) {
-          choice = $(e.target).parents(o.choice);
-          
-          $(o.choiceInner, choices).css('z-index', 10);
-          $(o.choiceInner, choice).css('z-index', 11);
-          
-          ui.helper.animate({ opacity: 0.5 }, 1000);
-        }
-      };
-      
       // Make the questions draggable.
       $(o.question, o.questions).draggable(o.draggable);
       
@@ -58,11 +41,19 @@
         }
       });
       
-      o.after;
+      if ( o.after )
+        o.after.call();
     });
   };
   
   $.fn.draggableQuiz.defaults = {
+    draggable: {
+      cursor: 'move',
+      helper: 'clone',
+      revert: 'invalid',
+      zIndex: 10000,
+      start: null
+    },
     speedIn: 500,
     speedOut: 500,
     question: '.question',
@@ -79,7 +70,7 @@
       $(this).animate({ opacity: 1 }, speed, callback);
     },
     questionOut: function(speed, callback) {
-      $(this).animate({ opacity: 0.5 }, speed, callback);
+      $(this).css({ opacity: 1 }).animate({ opacity: 0.5 }, speed, callback);
     },
     choiceIn: function(speed, callback) {
       $(this).hide().height(25).fadeIn(speed, callback);
@@ -95,32 +86,30 @@
       return false;
     
     // Add question to choice.
-    $question.clone().draggable(o.draggable).appendTo(o.choiceAppendTo ? $toChoice.find(o.choiceAppendTo) : $toChoice);
-    $(o.question +"[data='"+ $question.attr('data') +"']", $fromChoice).remove();
-    checkChoices(o);
-    
-    /*
-    // Add question to choice.
-    o.choiceIn.call(question.clone().draggable(o.draggable).appendTo(o.choiceAppendTo ? $(o.choiceAppendTo, toChoice) : toChoice), o.speedIn, function(){
-      o.choiceOut.call($(o.question +"[data='"+ question.attr('data') +"']", fromChoice), o.speedOut, function(){
-        $(this).remove();
-      });
-      
+    $to = $question.clone().draggable(o.draggable).appendTo(o.choiceAppendTo ? $toChoice.find(o.choiceAppendTo) : $toChoice);
+    o.choiceIn.call($to, o.speedIn, function(){
       checkChoices(o);
     });
     
-    // Disable question.
-    $(o.questions +' '+ o.question +"[data='"+ question.attr('data') +"']", o.self).draggable('disable').animate({ opacity: 0.5 }, o.speedOut);
-    */
+    // Remove question from previous choice.
+    $from = $(o.question +"[data='"+ $question.attr('data') +"']", $fromChoice);
+    o.choiceOut.call($from, o.speedOut, function(){
+      $(this).remove();
+    });
+    
+    // Disable the question.
+    $q = $(o.questions +' '+ o.question +"[data='"+ $question.attr('data') +"']", o.self).draggable('disable');
+    o.questionOut.call($q, o.speedOut);
   }
   
-  function unmakeChoice(question, o) {
-    o.choiceOut.call(question, o.speedOut, function(){
-      o.questionIn.call($(o.question +"[data='"+ question.attr('data') + "']", o.questions).draggable('enable'), o.speedIn, function(){
-        question.remove();
-        
-        checkChoices(o);
-      });
+  function unmakeChoice($question, o) {
+    // Enable the question.
+    $q = $(o.question +"[data='"+ $question.attr('data') + "']", o.questions).draggable('enable');
+    
+    o.questionIn.call($q, o.speedIn)
+    o.choiceOut.call($question, o.speedOut, function(){
+      $(this).remove();
+      checkChoices(o);
     });
   }
   
@@ -130,8 +119,8 @@
         if ( $(o.answers[a][i], a).length == 0 )
           return false;
     
-    alert('passed');
-    o.passed;
+    if ( o.passed )
+      o.passed.call();
   }
   
   
