@@ -21,7 +21,7 @@
           choices = $(o.choice, self);
       
       // Make the questions draggable.
-      $(o.question, o.questions).draggable(o.draggable);
+      $(o.question, o.questions).draggable(o.draggable).disableTextSelect().data('quiz.disabled', false);
       
       // Make the choices droppable.
       $(choices).droppable({
@@ -134,5 +134,17 @@
     if ( $.fn.draggableQuiz.debug )
       log(s);
   }
+  
+  $.extend($.fn.disableTextSelect = function() {
+    return this.each(function(){
+      if($.browser.mozilla){//Firefox
+        $(this).css('MozUserSelect','none');
+      }else if($.browser.msie){//IE
+        $(this).bind('selectstart',function(){return false;});
+      }else{//Opera, etc.
+        $(this).mousedown(function(){return false;});
+      }
+    });
+  });
   
 })(jQuery);
