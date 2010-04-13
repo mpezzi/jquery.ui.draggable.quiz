@@ -66,6 +66,7 @@
     choiceAppendTo: null,
     after: null,
     passed: null,
+    finished: null,
     questionIn: function(speed, callback) {
       $(this).animate({ opacity: 1 }, speed, callback);
     },
@@ -98,13 +99,13 @@
     });
     
     // Disable the question.
-    $q = $(o.questions +' '+ o.question +"[data='"+ $question.attr('data') +"']", o.self).draggable('disable');
+    $q = $(o.questions +' '+ o.question +"[data='"+ $question.attr('data') +"']", o.self).draggable('disable').data('quiz.disabled', true);
     o.questionOut.call($q, o.speedOut);
   }
   
   function unmakeChoice($question, o) {
     // Enable the question.
-    $q = $(o.question +"[data='"+ $question.attr('data') + "']", o.questions).draggable('enable');
+    $q = $(o.question +"[data='"+ $question.attr('data') + "']", o.questions).draggable('enable').data('quiz.disabled', false);
     
     o.questionIn.call($q, o.speedIn)
     o.choiceOut.call($question, o.speedOut, function(){
@@ -114,15 +115,52 @@
   }
   
   function checkChoices(o) {
+    debug('[checkChoices]');
+    
+    if ( checkPassed(o) )
+      return;
+    
+    if ( checkFinished(o) )
+      return;
+  }
+  
+  function checkFinished(o) {
+    debug('[checkFinished]');
+    
+    var finished = true, wrong = 0;
+    
+    // Check if test is finished.
+    $(o.question, o.questions).each(function(){
+      if ( !$(this).data('quiz.disabled') )
+        finished = false;
+    });
+    
+    if ( finished && o.finished ) {
+      for ( var a in o.answers )
+        for ( var i in o.answers[a] )
+          if ( $(o.answers[a][i], a).length == 0 )
+            wrong++;
+      
+      o.finished.call(this, wrong);
+    }
+    
+    return finished;
+  }
+  
+  function checkPassed(o) {
+    debug('[checkPassed]');
+    
     for ( var a in o.answers )
       for ( var i in o.answers[a] )
         if ( $(o.answers[a][i], a).length == 0 )
           return false;
     
+    // Test was passed.
     if ( o.passed )
       o.passed.call();
+      
+    return true;
   }
-  
   
   // Debug functions.
   function log(s) {
