@@ -100,13 +100,18 @@
     });
     
     // Disable the question.
-    $q = $(o.questions +' '+ o.question +"[data='"+ $question.attr('data') +"']", o.self).draggable('disable').data('quiz.disabled', true);
-    o.questionOut.call($q, o.speedOut);
+    $q = $(o.questions +' '+ o.question +"[data='"+ $question.attr('data') +"']", o.self);
+    
+    if ( !$q.data('quiz.disabled') ) {
+      $q.draggable('disable').css('cursor', 'default').data('quiz.disabled', true);
+      o.questionOut.call($q, o.speedOut);
+    }
+    
   }
   
   function unmakeChoice($question, o) {
     // Enable the question.
-    $q = $(o.question +"[data='"+ $question.attr('data') + "']", o.questions).draggable('enable').data('quiz.disabled', false);
+    $q = $(o.question +"[data='"+ $question.attr('data') + "']", o.questions).css('cursor', o.draggable.cursor).draggable('enable').data('quiz.disabled', false);
     
     o.questionIn.call($q, o.speedIn)
     o.choiceOut.call($question, o.speedOut, function(){
