@@ -74,7 +74,7 @@
       $(this).css({ opacity: 1 }).animate({ opacity: 0.5 }, speed, callback);
     },
     choiceIn: function(speed, callback) {
-      $(this).hide().height(25).fadeIn(speed, callback);
+      $(this).hide().height(40).fadeIn(speed, callback);
     },
     choiceOut: function(speed, callback) {
       $(this).fadeOut(speed, callback);
