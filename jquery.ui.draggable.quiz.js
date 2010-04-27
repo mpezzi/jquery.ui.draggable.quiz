@@ -96,6 +96,7 @@
     $from = $(o.question +"[data='"+ $question.attr('data') +"']", $fromChoice);
     o.choiceOut.call($from, o.speedOut, function(){
       $(this).remove();
+      checkChoices(o);
     });
     
     // Disable the question.
