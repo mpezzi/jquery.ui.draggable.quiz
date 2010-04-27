@@ -127,7 +127,7 @@
   function checkFinished(o) {
     debug('[checkFinished]');
     
-    var finished = true, wrong = 0;
+    var finished = true, wrong = 0, wrong_choices = [];
     
     // Check if test is finished.
     $(o.question, o.questions).each(function(){
@@ -136,12 +136,16 @@
     });
     
     if ( finished && o.finished ) {
-      for ( var a in o.answers )
-        for ( var i in o.answers[a] )
-          if ( $(o.answers[a][i], a).length == 0 )
+      for ( var a in o.answers ) {
+        for ( var i in o.answers[a] ) {
+          if ( $(o.answers[a][i], a).length == 0 ) {
+            wrong_choices[wrong] = o.answers[a][i];
             wrong++;
+          }
+        }
+      }
       
-      o.finished.call(this, wrong);
+      o.finished.call(this, wrong, wrong_choices);
     }
     
     return finished;
